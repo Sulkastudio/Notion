@@ -40,7 +40,7 @@ html, body {
 }
 
 body {
-  background: darkgray;
+  background: white;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,11 +53,10 @@ body {
   
 .clock {
   height: 25vh;
-  color: whitesmoke;
+  color: #626262;
   font-size: 10vh;
   font-family: 'pixeled';
   line-height: 20vh;
-          border: 1px solid whitesmoke;
   display: flex;
   position: relative;
   /*background: green;*/
@@ -68,14 +67,14 @@ body {
   content: '';
   width: 7ch;
   height: 3vh;
-  background: linear-gradient(to top, transparent, darkgray);
+  background: linear-gradient(to top, transparent, white);
   position: absolute;
   z-index: 2;
 }
 
 .clock::after {
   bottom: 0;
-  background: linear-gradient(to bottom, transparent, darkgray);
+  background: linear-gradient(to bottom, transparent, white);
 }
 
 .clock > div {
