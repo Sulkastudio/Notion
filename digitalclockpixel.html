@@ -40,17 +40,22 @@ html, body {
 }
 
 body {
-  background: black;
+  background: whitesmoke;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+  @font-face {
+    font-family: myFirstFont;
+    src: url(./fonts/pixeled.ttf);
+}
+  
 .clock {
   height: 20vh;
-  color: white;
+  color: darkgray;
   font-size: 22vh;
-  font-family: sans-serif;
+  font-family: pixeled;
   line-height: 20.4vh;
   display: flex;
   position: relative;
