@@ -1,0 +1,41 @@
+<div id="clock"></div>
+
+<style>
+body {
+    background: transparent;
+}
+  @font-face {
+    font-family: pixeled;
+    src: url(./fonts/Pixeled.ttf);
+}
+    
+.clock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    color: darkgray;
+    font-size: 60px;
+    font-family: pixeled;
+    letter-spacing: 7px;
+    padding: 5px;
+    padding-left: 20px;
+    border: 1px solid #ececec;
+   
+
+
+}
+</style>
+
+<script>
+function updateTime() {
+  var now = new Date();
+  var hours = now.getHours();
+  var minutes = now.getMinutes();
+  var seconds = now.getSeconds();
+  var timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+  document.getElementById('clock').textContent = timeString;
+}
+
+setInterval(updateTime, 1000);
+</script>
