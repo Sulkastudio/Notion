@@ -43,6 +43,7 @@ body {
   background: white;
   border: 1px solid white;
   padding: 5px;
+  position: absolute;
 }
 
   @font-face {
@@ -62,6 +63,14 @@ body {
   position: relative;
   /*background: green;*/
   overflow: hidden;
+}
+  
+  @media screen and (max-width: 768px) {
+  .clock {
+    font-size: 10vw;
+    height: 25vh;
+    line-height: 20vh;
+  }
 }
 
 .clock::before, .clock::after {
