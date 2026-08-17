@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Quote</title>
+<style>
+  :root{
+    --cream:#f6ecd9; --cream-deep:#ead6b0;
+    --sage:#7f9a63; --sage-deep:#4f6a3f;
+    --terracotta:#d98872; --terracotta-deep:#b1573f;
+    --wood:#8a6238; --ink:#3e2e22; --yellow:#eab53f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#2a2117; --cream-deep:#382c1e;
+      --sage:#7f9a63; --sage-deep:#a9c48a;
+      --terracotta:#d98872; --terracotta-deep:#e6a891;
+      --wood:#b98956; --ink:#f3e7d2; --yellow:#eab53f;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .card{
+    position:relative;
+    width:100%; max-width:460px;
+    background:var(--cream);
+    border:3px solid var(--ink);
+    border-radius:18px;
+    padding:22px 26px;
+    box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
+    display:flex; flex-direction:column; gap:10px;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(var(--cream-deep) 1px, transparent 1px);
+    background-size:14px 14px; opacity:.5; pointer-events:none;
+  }
+  .row-top{ display:flex; align-items:center; justify-content:space-between; z-index:1; }
+  .label{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sage-deep); font-weight:700;
+  }
+  .shuffle{
+    border:none; background:var(--cream-deep); color:var(--wood);
+    width:26px; height:26px; border-radius:8px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .shuffle:hover{ background:var(--terracotta); }
+  .shuffle svg{ width:14px; height:14px; }
+  .quote-mark{ font-size:38px; color:var(--terracotta); line-height:0; font-family:Georgia,serif; z-index:1; }
+  .quote-text{
+    font-size:18px; color:var(--ink); font-weight:600; line-height:1.45;
+    z-index:1; margin-top:-14px; text-wrap:balance;
+  }
+  .quote-author{ font-size:13px; color:var(--wood); font-weight:700; z-index:1; align-self:flex-end; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-top">
+      <span class="label">A little thought</span>
+      <button class="shuffle" id="shuffleBtn" title="New quote">
+        <svg viewBox="0 0 16 16" fill="currentColor"><path d="M12 2h2v2h-2zM10 4h2v2h-2zM8 6h2v2H8zM6 8h2v2H6zM4 10h2v2H4zM2 12h2v2H2z"/></svg>
+      </button>
+    </div>
+    <div class="quote-mark">&ldquo;</div>
+    <div class="quote-text" id="quoteText">Loading...</div>
+    <div class="quote-author" id="quoteAuthor"></div>
+  </div>
+
+<script>
+const quotes = [
+  ["Slow mornings are still mornings.", "Unknown"],
+  ["Water your own garden before you admire someone else's.", "Unknown"],
+  ["A little progress each day adds up to big results.", "Satya Nani"],
+  ["Bloom where you're planted.", "Proverb"],
+  ["Rest is not a reward, it's a requirement.", "Unknown"],
+  ["Small steps still move you forward.", "Unknown"],
+  ["The tea is warm, the day is new.", "Unknown"],
+  ["You don't have to see the whole staircase, just take the first step.", "Martin Luther King Jr."],
+  ["Do it with love or don't do it at all.", "Unknown"],
+  ["Everything is figureoutable.", "Marie Forleo"],
+  ["Let today be the day you plant seeds for tomorrow's joy.", "Unknown"],
+  ["Simplicity is the ultimate sophistication.", "Leonardo da Vinci"],
+  ["Take care of yourself, you're the only you that you have.", "Unknown"],
+  ["Somewhere, something incredible is waiting to be known.", "Carl Sagan"],
+  ["A calm mind brings inner strength and self-confidence.", "Dalai Lama"],
+  ["Be like a lemon: when life gets sour, make lemonade.", "Unknown"],
+  ["The quieter you become, the more you can hear.", "Rumi"],
+  ["Little by little, one travels far.", "J.R.R. Tolkien"],
+  ["What you seek is seeking you.", "Rumi"],
+  ["Enjoy the little things, for one day you may look back and realize they were the big things.", "Robert Brault"]
+];
+
+function dayIndex(){
+  const start = new Date(new Date().getFullYear(), 0, 0);
+  const now = new Date();
+  const diff = now - start;
+  const oneDay = 1000 * 60 * 60 * 24;
+  return Math.floor(diff / oneDay);
+}
+
+let currentIndex = dayIndex() % quotes.length;
+
+function render(idx){
+  document.getElementById('quoteText').textContent = quotes[idx][0];
+  document.getElementById('quoteAuthor').textContent = `— ${quotes[idx][1]}`;
+}
+
+document.getElementById('shuffleBtn').addEventListener('click', () => {
+  let next;
+  do { next = Math.floor(Math.random() * quotes.length); } while (next === currentIndex && quotes.length > 1);
+  currentIndex = next;
+  render(currentIndex);
+});
+
+render(currentIndex);
+</script>
+</body>
+</html>

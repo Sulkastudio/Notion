@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Today's Little Things</title>
+<style>
+  :root{
+    --cream:#f6ecd9; --cream-deep:#ead6b0;
+    --sage:#7f9a63; --sage-deep:#4f6a3f;
+    --terracotta:#d98872; --terracotta-deep:#b1573f;
+    --wood:#8a6238; --ink:#3e2e22; --yellow:#eab53f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#2a2117; --cream-deep:#382c1e;
+      --sage:#7f9a63; --sage-deep:#a9c48a;
+      --terracotta:#d98872; --terracotta-deep:#e6a891;
+      --wood:#b98956; --ink:#f3e7d2; --yellow:#eab53f;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; min-height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .card{
+    position:relative;
+    width:100%; max-width:420px;
+    background:var(--cream);
+    border:3px solid var(--ink);
+    border-radius:18px;
+    padding:20px 22px;
+    box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
+    display:flex; flex-direction:column; gap:10px;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(var(--cream-deep) 1px, transparent 1px);
+    background-size:14px 14px; opacity:.5; pointer-events:none;
+  }
+  .row-top{ display:flex; align-items:center; justify-content:space-between; z-index:1; }
+  .label{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sage-deep); font-weight:700;
+  }
+  .progress-pill{
+    font-size:11px; font-weight:700; color:var(--wood);
+    background:var(--cream-deep); padding:3px 9px; border-radius:20px;
+  }
+  ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; z-index:1; }
+  li{
+    display:flex; align-items:center; gap:10px;
+    background:var(--cream-deep); border-radius:10px; padding:8px 10px;
+  }
+  .check{
+    width:20px; height:20px; border:2px solid var(--wood); border-radius:6px;
+    flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    background:var(--cream); transition:background .15s ease, border-color .15s ease;
+  }
+  .check.done{ background:var(--sage); border-color:var(--sage-deep); }
+  .check svg{ width:12px; height:12px; opacity:0; transition:opacity .1s ease; }
+  .check.done svg{ opacity:1; }
+  .task-text{
+    flex:1; font-size:14px; color:var(--ink); font-weight:600; cursor:pointer;
+  }
+  .task-text.done{ text-decoration:line-through; color:var(--wood); opacity:.7; }
+  .remove{
+    border:none; background:transparent; color:var(--terracotta-deep);
+    font-size:15px; cursor:pointer; padding:0 2px; opacity:.6;
+  }
+  .remove:hover{ opacity:1; }
+  .add-row{ display:flex; gap:6px; z-index:1; }
+  .add-row input{
+    flex:1; font-family:inherit; font-size:13px; border:2px solid var(--wood);
+    border-radius:8px; padding:6px 9px; background:var(--cream); color:var(--ink);
+  }
+  .add-row button{
+    border:none; background:var(--sage); color:var(--cream);
+    font-size:13px; font-weight:700; padding:6px 14px; border-radius:8px; cursor:pointer;
+  }
+  .add-row button:hover{ background:var(--sage-deep); }
+  .empty{ font-size:13px; color:var(--wood); text-align:center; padding:6px 0; z-index:1; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-top">
+      <span class="label">Today's little things</span>
+      <span class="progress-pill" id="progress">0/0</span>
+    </div>
+    <ul id="list"></ul>
+    <div class="add-row">
+      <input type="text" id="newTask" placeholder="Add something sweet to do...">
+      <button id="addBtn">Add</button>
+    </div>
+  </div>
+
+<script>
+const STORE_KEY = 'cozy-checklist-tasks';
+const DEFAULT_TASKS = [
+  { text: 'Water the plants', done: false },
+  { text: 'Drink a glass of water', done: false },
+  { text: 'Write 3 lines in the journal', done: false }
+];
+
+function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+function safeSet(key, val){ try { localStorage.setItem(key, val); } catch(e){} }
+
+function getTasks(){
+  const raw = safeGet(STORE_KEY);
+  if (!raw){
+    safeSet(STORE_KEY, JSON.stringify(DEFAULT_TASKS));
+    return [...DEFAULT_TASKS];
+  }
+  try { return JSON.parse(raw); } catch(e){ return []; }
+}
+function saveTasks(tasks){ safeSet(STORE_KEY, JSON.stringify(tasks)); }
+
+function render(){
+  const tasks = getTasks();
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+
+  if (!tasks.length){
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'Nothing on the list — add something cozy 🌼';
+    list.appendChild(empty);
+  }
+
+  tasks.forEach((task, i) => {
+    const li = document.createElement('li');
+
+    const check = document.createElement('div');
+    check.className = 'check' + (task.done ? ' done' : '');
+    check.innerHTML = '<svg viewBox="0 0 16 16" fill="none" stroke="#fdf8ee" stroke-width="2"><path d="M3 8l3 3 7-7"/></svg>';
+    check.addEventListener('click', () => toggle(i));
+
+    const text = document.createElement('span');
+    text.className = 'task-text' + (task.done ? ' done' : '');
+    text.textContent = task.text;
+    text.addEventListener('click', () => toggle(i));
+
+    const remove = document.createElement('button');
+    remove.className = 'remove';
+    remove.textContent = '✕';
+    remove.addEventListener('click', () => removeTask(i));
+
+    li.appendChild(check);
+    li.appendChild(text);
+    li.appendChild(remove);
+    list.appendChild(li);
+  });
+
+  const doneCount = tasks.filter(t => t.done).length;
+  document.getElementById('progress').textContent = `${doneCount}/${tasks.length}`;
+}
+
+function toggle(i){
+  const tasks = getTasks();
+  tasks[i].done = !tasks[i].done;
+  saveTasks(tasks);
+  render();
+}
+function removeTask(i){
+  const tasks = getTasks();
+  tasks.splice(i, 1);
+  saveTasks(tasks);
+  render();
+}
+function addTask(){
+  const input = document.getElementById('newTask');
+  const val = input.value.trim();
+  if (!val) return;
+  const tasks = getTasks();
+  tasks.push({ text: val, done: false });
+  saveTasks(tasks);
+  input.value = '';
+  render();
+}
+
+document.getElementById('addBtn').addEventListener('click', addTask);
+document.getElementById('newTask').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') addTask();
+});
+
+render();
+</script>
+</body>
+</html>

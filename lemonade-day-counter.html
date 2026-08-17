@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Growing Streak</title>
+<style>
+  :root{
+    --cream:#f6ecd9;
+    --cream-deep:#ead6b0;
+    --sage:#7f9a63;
+    --sage-deep:#4f6a3f;
+    --terracotta:#d98872;
+    --terracotta-deep:#b1573f;
+    --wood:#8a6238;
+    --ink:#3e2e22;
+    --yellow:#eab53f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#2a2117; --cream-deep:#382c1e;
+      --sage:#7f9a63; --sage-deep:#a9c48a;
+      --terracotta:#d98872; --terracotta-deep:#e6a891;
+      --wood:#b98956; --ink:#f3e7d2; --yellow:#eab53f;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .card{
+    position:relative;
+    width:100%; max-width:440px;
+    background:var(--cream);
+    border:3px solid var(--ink);
+    border-radius:18px;
+    padding:20px 24px;
+    box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
+    display:flex; flex-direction:column; gap:10px;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(var(--cream-deep) 1px, transparent 1px);
+    background-size:14px 14px; opacity:.5; pointer-events:none;
+  }
+  .row-top{
+    display:flex; align-items:center; justify-content:space-between;
+    z-index:1;
+  }
+  .label{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sage-deep); font-weight:700;
+  }
+  .edit-btn{
+    border:none; background:var(--cream-deep); color:var(--wood);
+    font-size:11px; font-weight:700; padding:4px 9px; border-radius:8px;
+    cursor:pointer; letter-spacing:.03em;
+  }
+  .edit-btn:hover{ background:var(--terracotta); color:var(--cream); }
+  .main{
+    display:flex; align-items:flex-end; gap:16px; z-index:1;
+  }
+  .count{
+    font-family:"SF Mono","Courier New",monospace;
+    font-weight:800; font-size:56px; color:var(--ink); line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .count-label{
+    font-size:14px; color:var(--wood); font-weight:600; margin-bottom:8px;
+  }
+  .plant{ margin-left:auto; width:56px; height:56px; image-rendering:pixelated; }
+  .since{
+    font-size:12.5px; color:var(--sage-deep); z-index:1; font-weight:600;
+  }
+  .panel{
+    display:none; gap:8px; align-items:center; z-index:1;
+    background:var(--cream-deep); border-radius:10px; padding:10px 12px;
+    margin-top:2px;
+  }
+  .panel.open{ display:flex; }
+  .panel label{ font-size:12px; color:var(--wood); font-weight:600; }
+  .panel input{
+    font-family:inherit; font-size:13px; border:2px solid var(--wood);
+    border-radius:8px; padding:5px 8px; background:var(--cream); color:var(--ink);
+  }
+  .panel button{
+    border:none; background:var(--sage); color:var(--cream);
+    font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; cursor:pointer;
+  }
+  .panel button:hover{ background:var(--sage-deep); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-top">
+      <span class="label" id="titleLabel">Journaling streak</span>
+      <button class="edit-btn" id="editBtn">Edit</button>
+    </div>
+    <div class="main">
+      <div>
+        <div class="count" id="dayCount">0</div>
+        <div class="count-label" id="dayWord">days</div>
+      </div>
+      <svg class="plant" id="plantIcon" viewBox="0 0 16 16"></svg>
+    </div>
+    <div class="since" id="sinceText">Set a start date to begin →</div>
+
+    <div class="panel" id="panel">
+      <label for="startDate">Started on</label>
+      <input type="date" id="startDate">
+      <button id="saveBtn">Save</button>
+    </div>
+  </div>
+
+<script>
+const STORE_KEY = 'cozy-day-counter-start';
+const TITLE_KEY = 'cozy-day-counter-title';
+
+function safeGet(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+function safeSet(key, val){ try { localStorage.setItem(key, val); } catch(e){} }
+
+const seed = `<rect x="7" y="12" width="2" height="3" fill="#8a6238"/><rect x="6" y="14" width="4" height="1" fill="#8a6238"/><circle cx="8" cy="10" r="2" fill="#7f9a63"/>`;
+const sprout = `<rect x="7" y="9" width="2" height="6" fill="#8a6238"/><rect x="6" y="14" width="4" height="1" fill="#8a6238"/><path d="M8 9 C4 9 3 6 3 4 C6 4 8 6 8 9 Z" fill="#7f9a63"/><path d="M8 9 C12 9 13 6 13 4 C10 4 8 6 8 9 Z" fill="#5f7a45"/>`;
+const plantMid = `<rect x="7" y="8" width="2" height="7" fill="#8a6238"/><rect x="5" y="14" width="6" height="1" fill="#8a6238"/><path d="M8 8 C3 8 2 4 2 2 C6 2 8 5 8 8 Z" fill="#7f9a63"/><path d="M8 8 C13 8 14 4 14 2 C10 2 8 5 8 8 Z" fill="#5f7a45"/><path d="M8 8 C6 8 5 6 5 5 C7 5 8 6 8 8 Z" fill="#9cb47f"/>`;
+const bloom = `<rect x="7" y="9" width="2" height="6" fill="#8a6238"/><rect x="5" y="14" width="6" height="1" fill="#8a6238"/><path d="M8 9 C3 9 2 5 2 3 C6 3 8 6 8 9 Z" fill="#7f9a63"/><path d="M8 9 C13 9 14 5 14 3 C10 3 8 6 8 9 Z" fill="#5f7a45"/><g transform="translate(8,4)"><circle cx="0" cy="-2" r="1.6" fill="#d98872"/><circle cx="2" cy="-1" r="1.6" fill="#d98872"/><circle cx="1.2" cy="1.4" r="1.6" fill="#d98872"/><circle cx="-1.2" cy="1.4" r="1.6" fill="#d98872"/><circle cx="-2" cy="-1" r="1.6" fill="#d98872"/><circle cx="0" cy="0" r="1.4" fill="#eab53f"/></g>`;
+
+function stageFor(days){
+  if (days <= 0) return seed;
+  if (days < 3) return sprout;
+  if (days < 10) return plantMid;
+  return bloom;
+}
+
+function fmtDate(d){
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+}
+
+function daysBetween(a,b){
+  const msPerDay = 24*60*60*1000;
+  const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+  return Math.round((utcB-utcA)/msPerDay);
+}
+
+function render(){
+  const stored = safeGet(STORE_KEY);
+  const countEl = document.getElementById('dayCount');
+  const wordEl = document.getElementById('dayWord');
+  const sinceEl = document.getElementById('sinceText');
+  const plantEl = document.getElementById('plantIcon');
+
+  if (!stored){
+    countEl.textContent = '0';
+    wordEl.textContent = 'days';
+    sinceEl.textContent = 'Set a start date to begin →';
+    plantEl.innerHTML = seed;
+    return;
+  }
+  const start = new Date(stored + 'T00:00:00');
+  const today = new Date();
+  const diff = Math.max(0, daysBetween(start, today));
+  countEl.textContent = diff;
+  wordEl.textContent = diff === 1 ? 'day' : 'days';
+  sinceEl.textContent = `Since ${fmtDate(start)} 🌱`;
+  plantEl.innerHTML = stageFor(diff);
+}
+
+document.getElementById('editBtn').addEventListener('click', () => {
+  const panel = document.getElementById('panel');
+  panel.classList.toggle('open');
+  const stored = safeGet(STORE_KEY);
+  if (stored) document.getElementById('startDate').value = stored;
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const val = document.getElementById('startDate').value;
+  if (val){
+    safeSet(STORE_KEY, val);
+    document.getElementById('panel').classList.remove('open');
+    render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>

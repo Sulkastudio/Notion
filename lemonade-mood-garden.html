@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mood Garden</title>
+<style>
+  :root{
+    --cream:#f6ecd9; --cream-deep:#ead6b0;
+    --sage:#7f9a63; --sage-deep:#4f6a3f;
+    --terracotta:#d98872; --terracotta-deep:#b1573f;
+    --wood:#8a6238; --ink:#3e2e22; --yellow:#eab53f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#2a2117; --cream-deep:#382c1e;
+      --sage:#7f9a63; --sage-deep:#a9c48a;
+      --terracotta:#d98872; --terracotta-deep:#e6a891;
+      --wood:#b98956; --ink:#f3e7d2; --yellow:#eab53f;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    background:transparent;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .card{
+    position:relative;
+    width:100%; max-width:460px;
+    background:var(--cream);
+    border:3px solid var(--ink);
+    border-radius:18px;
+    padding:20px 24px;
+    box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
+    display:flex; flex-direction:column; gap:12px;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image:radial-gradient(var(--cream-deep) 1px, transparent 1px);
+    background-size:14px 14px; opacity:.5; pointer-events:none;
+  }
+  .label{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--sage-deep); font-weight:700; z-index:1;
+  }
+  .moods{ display:flex; justify-content:space-between; z-index:1; gap:6px; }
+  .mood-btn{
+    flex:1; border:2px solid transparent; background:var(--cream-deep);
+    border-radius:12px; padding:8px 0; font-size:22px; cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .mood-btn:hover{ transform:translateY(-2px); }
+  .mood-btn.active{ border-color:var(--terracotta); background:var(--terracotta); }
+  .bed{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    gap:6px; z-index:1; background:var(--cream-deep); border-radius:12px;
+    padding:10px 10px 6px; margin-top:2px;
+  }
+  .plot{ display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+  .plot svg{ width:26px; height:26px; }
+  .plot span{ font-size:9.5px; color:var(--wood); font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+  .plot.today span{ color:var(--terracotta-deep); }
+  .hint{ font-size:11.5px; color:var(--wood); z-index:1; text-align:center; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="label">How's today?</span>
+    <div class="moods" id="moods">
+      <button class="mood-btn" data-mood="great" title="Great">🌻</button>
+      <button class="mood-btn" data-mood="good" title="Good">🌿</button>
+      <button class="mood-btn" data-mood="okay" title="Okay">🌾</button>
+      <button class="mood-btn" data-mood="low" title="Low">🌧️</button>
+      <button class="mood-btn" data-mood="rough" title="Rough">🌫️</button>
+    </div>
+    <div class="bed" id="bed"></div>
+    <div class="hint" id="hint">Tap a mood to plant today's flower</div>
+  </div>
+
+<script>
+const STORE_KEY = 'cozy-mood-garden';
+const moodColors = {
+  great:'#eab53f', good:'#7f9a63', okay:'#c9a86a', low:'#7fa6c9', rough:'#a79bb8'
+};
+const moodEmoji = { great:'🌻', good:'🌿', okay:'🌾', low:'🌧️', rough:'🌫️' };
+
+function flowerSVG(color){
+  return `
+  <rect x="11" y="15" width="2" height="7" fill="#8a6238"/>
+  <path d="M12 15 C7 15 6 11 6 9 C10 9 12 12 12 15 Z" fill="#5f7a45"/>
+  <g transform="translate(12,8)">
+    <circle cx="0" cy="-3" r="2.4" fill="${color}"/>
+    <circle cx="3" cy="-1.5" r="2.4" fill="${color}"/>
+    <circle cx="1.8" cy="2" r="2.4" fill="${color}"/>
+    <circle cx="-1.8" cy="2" r="2.4" fill="${color}"/>
+    <circle cx="-3" cy="-1.5" r="2.4" fill="${color}"/>
+    <circle cx="0" cy="0" r="2.1" fill="#eab53f"/>
+  </g>`;
+}
+function emptyPlotSVG(){
+  return `<rect x="4" y="20" width="18" height="2" fill="#8a6238"/><rect x="10" y="18" width="1" height="1" fill="#5f7a45"/><rect x="14" y="17" width="1" height="1" fill="#5f7a45"/>`;
+}
+
+function getData(){
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveData(d){ try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch(e){} }
+
+function isoDate(d){ return d.toISOString().slice(0,10); }
+
+function last7(){
+  const arr = [];
+  for (let i = 6; i >= 0; i--){
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    arr.push(d);
+  }
+  return arr;
+}
+
+function render(){
+  const data = getData();
+  const today = isoDate(new Date());
+  const bed = document.getElementById('bed');
+  bed.innerHTML = '';
+  const dayLetters = ['S','M','T','W','T','F','S'];
+
+  last7().forEach(d => {
+    const key = isoDate(d);
+    const mood = data[key];
+    const plot = document.createElement('div');
+    plot.className = 'plot' + (key === today ? ' today' : '');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 26 26');
+    svg.innerHTML = mood ? flowerSVG(moodColors[mood]) : emptyPlotSVG();
+    const span = document.createElement('span');
+    span.textContent = dayLetters[d.getDay()];
+    plot.appendChild(svg);
+    plot.appendChild(span);
+    bed.appendChild(plot);
+  });
+
+  document.querySelectorAll('.mood-btn').forEach(btn => {
+    btn.classList.toggle('active', data[today] === btn.dataset.mood);
+  });
+
+  const hint = document.getElementById('hint');
+  hint.textContent = data[today]
+    ? `Today's flower: ${moodEmoji[data[today]]} — come back tomorrow`
+    : "Tap a mood to plant today's flower";
+}
+
+document.getElementById('moods').addEventListener('click', (e) => {
+  const btn = e.target.closest('.mood-btn');
+  if (!btn) return;
+  const data = getData();
+  data[isoDate(new Date())] = btn.dataset.mood;
+  saveData(data);
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

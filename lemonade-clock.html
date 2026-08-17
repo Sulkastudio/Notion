@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cozy Clock</title>
+<style>
+  :root{
+    --cream:#f6ecd9;
+    --cream-deep:#ead6b0;
+    --sage:#7f9a63;
+    --sage-deep:#4f6a3f;
+    --terracotta:#d98872;
+    --terracotta-deep:#b1573f;
+    --wood:#8a6238;
+    --ink:#3e2e22;
+    --yellow:#eab53f;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream:#2a2117;
+      --cream-deep:#382c1e;
+      --sage:#7f9a63;
+      --sage-deep:#a9c48a;
+      --terracotta:#d98872;
+      --terracotta-deep:#e6a891;
+      --wood:#b98956;
+      --ink:#f3e7d2;
+      --yellow:#eab53f;
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .card{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    background:var(--cream);
+    border:3px solid var(--ink);
+    border-radius:18px;
+    padding:22px 26px 20px;
+    box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(var(--cream-deep) 1px, transparent 1px);
+    background-size:14px 14px;
+    opacity:.5;
+    pointer-events:none;
+  }
+  .row-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    z-index:1;
+  }
+  .label{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--sage-deep);
+    font-weight:700;
+  }
+  .icon{
+    width:26px;
+    height:26px;
+    image-rendering:pixelated;
+    shape-rendering:crispEdges;
+    transition:opacity .4s ease;
+  }
+  .time{
+    font-family:"SF Mono","Courier New",monospace;
+    font-variant-numeric:tabular-nums;
+    font-weight:800;
+    font-size:52px;
+    color:var(--ink);
+    letter-spacing:1px;
+    z-index:1;
+    line-height:1.05;
+  }
+  .time .secs{
+    font-size:22px;
+    color:var(--terracotta-deep);
+    font-weight:700;
+    vertical-align:baseline;
+    margin-left:4px;
+  }
+  .date{
+    font-size:14px;
+    color:var(--wood);
+    font-weight:600;
+    z-index:1;
+    margin-top:-2px;
+  }
+  .divider{
+    width:60%;
+    height:2px;
+    background:repeating-linear-gradient(90deg, var(--terracotta) 0 6px, transparent 6px 12px);
+    margin:8px 0 2px;
+    z-index:1;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="row-top">
+      <span class="label">Right now</span>
+      <svg id="icon" class="icon" viewBox="0 0 16 16"></svg>
+    </div>
+    <div class="time" id="time">--:--<span class="secs" id="secs">--</span></div>
+    <div class="divider"></div>
+    <div class="date" id="date">Loading...</div>
+  </div>
+
+<script>
+const sunSVG = `
+<rect x="6" y="1" width="4" height="2" fill="#eab53f"/>
+<rect x="6" y="13" width="4" height="2" fill="#eab53f"/>
+<rect x="1" y="6" width="2" height="4" fill="#eab53f"/>
+<rect x="13" y="6" width="2" height="4" fill="#eab53f"/>
+<rect x="3" y="3" width="2" height="2" fill="#eab53f"/>
+<rect x="11" y="3" width="2" height="2" fill="#eab53f"/>
+<rect x="3" y="11" width="2" height="2" fill="#eab53f"/>
+<rect x="11" y="11" width="2" height="2" fill="#eab53f"/>
+<rect x="4" y="4" width="8" height="8" fill="#eab53f"/>
+`;
+const moonSVG = `
+<path d="M9 2 h3 v2 h-2 v2 h-2 v2 h-2 v2 h-2 v2 h2 v2 h2 v2 h2 v-2 h2 v-2 h2 v-2 h-3 v-2 h1 v-2 h-1 v-2 h-1 z" fill="#c9c2e0" transform="translate(-0.5,0)"/>
+<rect x="5" y="4" width="6" height="8" fill="#e9e4f5"/>
+<rect x="4" y="5" width="1" height="6" fill="#e9e4f5"/>
+<rect x="11" y="5" width="1" height="6" fill="#e9e4f5"/>
+<rect x="6" y="3" width="4" height="1" fill="#e9e4f5"/>
+<rect x="6" y="12" width="4" height="1" fill="#e9e4f5"/>
+<rect x="3" y="2" width="1" height="1" fill="#f6ecd9"/>
+<rect x="13" y="9" width="1" height="1" fill="#f6ecd9"/>
+`;
+
+function render(){
+  const now = new Date();
+  const h = now.getHours();
+  const hh = String(h % 12 === 0 ? 12 : h % 12).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  document.getElementById('time').innerHTML = `${hh}:${mm} <span class="secs">${ampm}</span>`;
+
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('date').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+  const icon = document.getElementById('icon');
+  icon.innerHTML = (h >= 6 && h < 19) ? sunSVG : moonSVG;
+}
+render();
+setInterval(render, 1000);
+</script>
+</body>
+</html>
