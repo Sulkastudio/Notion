@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Lemonade Stand Widgets",
+  "provider_url": "https://sulkastudio.github.io/Notion/",
+  "title": "Growing Streak",
+  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-day-counter.html\" width=\"460\" height=\"250\" style=\"border:none;\" scrolling=\"no\"></iframe>",
+  "width": 460,
+  "height": 250
+}

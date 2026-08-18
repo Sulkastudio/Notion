@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "type": "rich",
+  "provider_name": "Lemonade Stand Widgets",
+  "provider_url": "https://sulkastudio.github.io/Notion/",
+  "title": "Mood Garden",
+  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-mood-garden.html\" width=\"480\" height=\"290\" style=\"border:none;\" scrolling=\"no\"></iframe>",
+  "width": 480,
+  "height": 290
+}
