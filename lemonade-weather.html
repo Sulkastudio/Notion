@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Little Weather</title>
-<link rel="alternate" type="application/json+oembed" href="https://sulkastudio.github.io/Notion/oembed-lemonade-weather.json" title="Little Weather">
 <style>
   :root{
     --cream:#f6ecd9; --cream-deep:#ead6b0;
@@ -49,13 +48,9 @@
   .label{
     font-size:11px; letter-spacing:.14em; text-transform:uppercase;
     color:var(--sage-deep); font-weight:700;
+    cursor:pointer; width:fit-content;
   }
-  .edit-btn{
-    border:none; background:var(--cream-deep); color:var(--wood);
-    font-size:11px; font-weight:700; padding:4px 9px; border-radius:8px;
-    cursor:pointer;
-  }
-  .edit-btn:hover{ background:var(--terracotta); color:var(--cream); }
+  .label:hover{ text-decoration:underline; }
   .main{ display:flex; align-items:center; gap:16px; z-index:1; }
   .icon{ width:58px; height:58px; image-rendering:pixelated; flex-shrink:0; }
   .temp{
@@ -87,7 +82,6 @@
   <div class="card">
     <div class="row-top">
       <span class="label" id="placeLabel">Weather</span>
-      <button class="edit-btn" id="editBtn">Change city</button>
     </div>
     <div class="main">
       <svg class="icon" id="wxIcon" viewBox="0 0 16 16"></svg>
@@ -187,7 +181,7 @@ async function setCity(city){
   }
 }
 
-document.getElementById('editBtn').addEventListener('click', () => {
+document.getElementById('placeLabel').addEventListener('click', () => {
   document.getElementById('panel').classList.toggle('open');
 });
 document.getElementById('saveBtn').addEventListener('click', () => {
