@@ -4,7 +4,7 @@
   "provider_name": "Lemonade Stand Widgets",
   "provider_url": "https://sulkastudio.github.io/Notion/",
   "title": "Feelings Check",
-  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-feelings-check.html\" width=\"460\" height=\"260\" style=\"border:none;\" scrolling=\"no\"></iframe>",
-  "width": 460,
-  "height": 260
+  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-feelings-check.html\" width=\"660\" height=\"460\" style=\"border:none;\" scrolling=\"no\"></iframe>",
+  "width": 660,
+  "height": 460
 }
