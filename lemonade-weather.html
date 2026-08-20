@@ -28,11 +28,11 @@
   }
   .card{
     position:relative;
-    width:100%; max-width:440px;
+    width:100%; max-width:780px;
     background:var(--cream);
     border:3px solid var(--ink);
     border-radius:18px;
-    padding:20px 24px;
+    padding:clamp(16px,4vw,28px) clamp(18px,5vw,34px);
     box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
     display:flex; flex-direction:column; gap:10px;
     overflow:hidden;
@@ -46,21 +46,21 @@
   }
   .row-top{ display:flex; align-items:center; justify-content:space-between; z-index:1; }
   .label{
-    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    font-size:clamp(10px,2.2vw,14px); letter-spacing:.14em; text-transform:uppercase;
     color:var(--sage-deep); font-weight:700;
     cursor:pointer; width:fit-content;
   }
   .label:hover{ text-decoration:underline; }
   .main{ display:flex; align-items:center; gap:16px; z-index:1; }
-  .icon{ width:58px; height:58px; image-rendering:pixelated; flex-shrink:0; }
+  .icon{ width:clamp(44px,9vw,80px); height:clamp(44px,9vw,80px); image-rendering:pixelated; flex-shrink:0; }
   .temp{
     font-family:"SF Mono","Courier New",monospace;
-    font-weight:800; font-size:44px; color:var(--ink); line-height:1;
+    font-weight:800; font-size:clamp(30px,8.5vw,68px); color:var(--ink); line-height:1;
     font-variant-numeric:tabular-nums;
   }
-  .cond{ font-size:14px; color:var(--wood); font-weight:600; margin-top:2px; }
-  .place{ font-size:13px; color:var(--sage-deep); font-weight:700; z-index:1; }
-  .lohi{ font-size:12px; color:var(--wood); z-index:1; }
+  .cond{ font-size:clamp(12px,2.8vw,17px); color:var(--wood); font-weight:600; margin-top:2px; }
+  .place{ font-size:clamp(11px,2.4vw,15px); color:var(--sage-deep); font-weight:700; z-index:1; }
+  .lohi{ font-size:clamp(10.5px,2.2vw,14px); color:var(--wood); z-index:1; }
   .panel{
     display:none; gap:8px; align-items:center; z-index:1;
     background:var(--cream-deep); border-radius:10px; padding:10px 12px; margin-top:2px;

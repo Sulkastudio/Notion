@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Daily Quote</title>
-<link rel="alternate" type="application/json+oembed" href="https://sulkastudio.github.io/Notion/oembed-lemonade-quote.json" title="Daily Quote">
 <style>
   :root{
     --cream:#f6ecd9; --cream-deep:#ead6b0;
@@ -29,11 +28,11 @@
   }
   .card{
     position:relative;
-    width:100%; max-width:460px;
+    width:100%; max-width:800px;
     background:var(--cream);
     border:3px solid var(--ink);
     border-radius:18px;
-    padding:22px 26px;
+    padding:clamp(18px,4.5vw,32px) clamp(20px,5.5vw,38px);
     box-shadow:0 4px 0 var(--ink), 0 10px 20px rgba(62,46,34,0.15);
     display:flex; flex-direction:column; gap:10px;
     overflow:hidden;
@@ -46,22 +45,22 @@
   }
   .row-top{ display:flex; align-items:center; justify-content:space-between; z-index:1; }
   .label{
-    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    font-size:clamp(10px,2.2vw,14px); letter-spacing:.14em; text-transform:uppercase;
     color:var(--sage-deep); font-weight:700;
   }
   .shuffle{
     border:none; background:var(--cream-deep); color:var(--wood);
-    width:26px; height:26px; border-radius:8px; cursor:pointer;
+    width:clamp(24px,4.5vw,34px); height:clamp(24px,4.5vw,34px); border-radius:8px; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
   }
   .shuffle:hover{ background:var(--terracotta); }
-  .shuffle svg{ width:14px; height:14px; }
-  .quote-mark{ font-size:38px; color:var(--terracotta); line-height:0; font-family:Georgia,serif; z-index:1; }
+  .shuffle svg{ width:52%; height:52%; }
+  .quote-mark{ font-size:clamp(30px,7vw,54px); color:var(--terracotta); line-height:0; font-family:Georgia,serif; z-index:1; }
   .quote-text{
-    font-size:18px; color:var(--ink); font-weight:600; line-height:1.45;
+    font-size:clamp(15px,3.6vw,26px); color:var(--ink); font-weight:600; line-height:1.45;
     z-index:1; margin-top:-14px; text-wrap:balance;
   }
-  .quote-author{ font-size:13px; color:var(--wood); font-weight:700; z-index:1; align-self:flex-end; }
+  .quote-author{ font-size:clamp(11.5px,2.4vw,16px); color:var(--wood); font-weight:700; z-index:1; align-self:flex-end; }
 </style>
 </head>
 <body>
