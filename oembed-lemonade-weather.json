@@ -4,7 +4,7 @@
   "provider_name": "Lemonade Stand Widgets",
   "provider_url": "https://sulkastudio.github.io/Notion/",
   "title": "Little Weather",
-  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-weather.html?v=6\" width=\"100%\" height=\"100%\" style=\"border:none;\" scrolling=\"no\"></iframe>",
+  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-weather.html?v=7\" width=\"100%\" height=\"100%\" style=\"border:none;\" scrolling=\"no\"></iframe>",
   "width": 700,
   "height": 365
 }
