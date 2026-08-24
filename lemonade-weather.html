@@ -52,7 +52,8 @@
     cursor:pointer; width:fit-content;
   }
   .label:hover{ text-decoration:underline; }
-  .main{ display:flex; align-items:center; gap:16px; z-index:1; }
+  .main{ display:flex; align-items:center; justify-content:space-between; gap:16px; z-index:1; }
+  .left-block{ display:flex; align-items:center; gap:16px; min-width:0; }
   .icon{ width:clamp(44px,10.5vw,208px); height:clamp(44px,10.5vw,208px); image-rendering:pixelated; flex-shrink:0; }
   .temp{
     font-family:"SF Mono","Courier New",monospace;
@@ -60,8 +61,14 @@
     font-variant-numeric:tabular-nums;
   }
   .cond{ font-size:clamp(12px,2.81vw,44px); color:var(--wood); font-weight:600; margin-top:2px; }
-  .place{ font-size:clamp(11px,2.4vw,39px); color:var(--sage-deep); font-weight:700; z-index:1; }
-  .lohi{ font-size:clamp(10.5px,2.19vw,36px); color:var(--wood); z-index:1; }
+  .lohi{
+    display:flex; flex-direction:column; align-items:flex-end; gap:4px;
+    font-size:clamp(12px,2.81vw,40px); color:var(--wood); font-weight:700; z-index:1;
+    flex-shrink:0;
+  }
+  .lohi span{ white-space:nowrap; }
+  .lohi .hi{ color:var(--terracotta-deep); }
+  .lohi .lo{ color:var(--sage-deep); }
   .panel{
     display:none; gap:8px; align-items:center; z-index:1;
     background:var(--cream-deep); border-radius:10px; padding:10px 12px; margin-top:2px;
@@ -85,13 +92,15 @@
       <span class="label" id="placeLabel">Weather</span>
     </div>
     <div class="main">
-      <svg class="icon" id="wxIcon" viewBox="0 0 16 16"></svg>
-      <div>
-        <div class="temp" id="temp">--°</div>
-        <div class="cond" id="cond">Loading...</div>
+      <div class="left-block">
+        <svg class="icon" id="wxIcon" viewBox="0 0 16 16"></svg>
+        <div>
+          <div class="temp" id="temp">--°</div>
+          <div class="cond" id="cond">Loading...</div>
+        </div>
       </div>
+      <div class="lohi" id="lohi"></div>
     </div>
-    <div class="lohi" id="lohi"></div>
 
     <div class="panel" id="panel">
       <input type="text" id="cityInput" placeholder="Try: Paris, Lyon, Marseille...">
@@ -164,7 +173,7 @@ async function loadWeather(loc){
     const lo = Math.round(data.daily.temperature_2m_min[0]);
     document.getElementById('temp').textContent = `${temp}°`;
     document.getElementById('cond').textContent = condForCode(code);
-    document.getElementById('lohi').textContent = `H:${hi}°  L:${lo}°`;
+    document.getElementById('lohi').innerHTML = `<span class="hi">H: ${hi}°</span><span class="lo">L: ${lo}°</span>`;
     document.getElementById('wxIcon').innerHTML = iconForCode(code);
   }catch(e){
     document.getElementById('cond').textContent = 'Could not load weather';

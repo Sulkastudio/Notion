@@ -51,7 +51,7 @@
     box-shadow:0 3px 0 var(--ink), 0 5px 10px rgba(62,46,34,0.16);
     display:flex;
     flex-direction:column;
-    align-items:center;
+    align-items:stretch;
     gap:6px;
     overflow:hidden;
   }
@@ -94,6 +94,7 @@
     letter-spacing:1px;
     z-index:1;
     line-height:1.05;
+    text-align:center;
   }
   .time .secs{
     font-size:clamp(16px,4.5vw,54px);
@@ -108,8 +109,10 @@
     font-weight:600;
     z-index:1;
     margin-top:-2px;
+    text-align:center;
   }
   .divider{
+    align-self:center;
     width:60%;
     height:2px;
     background:repeating-linear-gradient(90deg, var(--terracotta) 0 6px, transparent 6px 12px);
