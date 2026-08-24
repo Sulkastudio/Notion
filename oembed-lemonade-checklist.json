@@ -4,7 +4,7 @@
   "provider_name": "Lemonade Stand Widgets",
   "provider_url": "https://sulkastudio.github.io/Notion/",
   "title": "Today's Little Things",
-  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-checklist.html?v=2\" width=\"100%\" height=\"100%\" style=\"border:none;\" scrolling=\"no\"></iframe>",
+  "html": "<iframe src=\"https://sulkastudio.github.io/Notion/lemonade-checklist.html?v=3\" width=\"100%\" height=\"100%\" style=\"border:none;\" scrolling=\"no\"></iframe>",
   "width": 440,
   "height": 320
 }
